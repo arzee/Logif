@@ -846,6 +846,7 @@ instructions :-
         write('repair.                  -- to repair a certain part of the ship.'), nl,
         write('investigate.             -- to look around you in more detail.'), nl,
         write('attack(NPC).             -- to attack an NPC.'), nl,
+	write('quest.			 -- to look at your current quest.'), nl,
         nl.
 
 
@@ -916,6 +917,7 @@ run(w) :- w, !.
 run(e) :- e, !.
 run(u) :- u, !.
 run(d) :- d, !.
+run(quest) :- quest, !.
 run(_) :- write('Wrong command'), nl, nl.
 
 
@@ -1118,6 +1120,52 @@ random_assign([A|L1],Lb,L) :-
 	append(Ls,[A, Part],L),
 	random_assign(L1,L2,Ls).
 
+/* These rules tells player about the ongoing quest */
+quest :- /*quest saat ga punya senter*/
+	at(L),
+	\+isMember([flashlight, in_hand], L),
+	write('Main Quest: -Investigate what''s going on.'),nl,
+	write('Side Quest: -Find something to enlighten your paths.'),nl,nl,!.
+
+quest :- /*quest saat ga punya senter dan ketemu alien*/
+	at(L),
+	\+isMember([flashlight, in_hand], L),
+	isMember([player, Place], L),
+	isMember([alien, Somewhere], L),
+	path(Place, _, Somewhere),
+	write('Main Quest: -Investigate what''s going on.'),nl,
+	write('Side Quest: -Find something to enlighten your paths.'),nl,
+	write('          : -Stay alive'),nl,nl,!.
+
+quest :-  /*quest saat punya senter*/
+	at(L),
+	isMember([flashlight, in_hand], L),
+	write('Main Quest: -Find out what''s going on'),nl,nl,!.
+
+quest :- /*quest saat punya senter dan ketemu alien*/
+	at(L),
+	isMember([flashlight, in_hand], L),
+	isMember([player, Place], L),
+	isMember([alien, Somewhere], L),
+	path(Place, _, Somewhere),
+	write('Main Quest: -Find out what''s going on'),nl,
+	write('Side Quest: -Stay alive'),nl,nl,!.
+
+quest :-
+	at(L),
+	isMember([flashlight, in_hand], L),
+	isMember([manual, in_hand], L),
+	write('Main Quest: Repair the ship'),nl,nl,!.
+	
+quest :-
+	position(L),
+	isMember([player, Place], L),
+	isMember([alien, Somewhere], L),
+	isMember([flashlight, in_hand], L),
+	isMember([manual, in_hand], L),
+	path(Place, _, Somewhere),
+	write('Main Quest: -Repair the ship.'),nl,
+	write('Side Quest: -Stay alive.'), nl, nl, !.
 
 
 
